@@ -3,4 +3,6 @@
 GET {{ProductManagement.API_HostAddress}}/weatherforecast/
 Accept: application/json
 
+GET {{ProductManagement.API_HostAddress}}/api/product
+Accept: application/json
 ###
