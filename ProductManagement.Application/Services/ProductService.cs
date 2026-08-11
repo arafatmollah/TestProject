@@ -1,16 +1,18 @@
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Domain.Entities;
-
+using Microsoft.Extensions.Caching.Memory;
 namespace ProductManagement.Application.Services;
 
 public class ProductService : IProductService
 {
     private readonly IProductRepository _repository;
+    private readonly IMemoryCache _cache;
 
-    public ProductService(IProductRepository repository)
+    public ProductService(IProductRepository repository, IMemoryCache cache)
     {
         _repository = repository;
+        _cache = cache;
     }
 
     public async Task<List<ProductDto>> GetAllAsync(
@@ -18,18 +20,34 @@ public class ProductService : IProductService
     decimal? price,
     CancellationToken cancellationToken = default)
     {
+        var cacheKey = $"products:{search}:{price}";
+
+        if (_cache.TryGetValue(
+            cacheKey,
+            out List<ProductDto>? cachedProducts))
+        {
+            return cachedProducts!;
+        }
+
         var products = await _repository.GetAllAsync(
             search,
             price,
             cancellationToken);
 
-        return products.Select(p => new ProductDto
+        var result = products.Select(p => new ProductDto
         {
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
             Price = p.Price
         }).ToList();
+
+        _cache.Set(
+            cacheKey,
+            result,
+            TimeSpan.FromMinutes(5));
+
+        return result;
     }
 
     public async Task<ProductDto?> GetByIdAsync(Guid id)
