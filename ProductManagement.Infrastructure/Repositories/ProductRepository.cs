@@ -16,12 +16,17 @@ public class ProductRepository : IProductRepository
     }
 
     public async Task<List<Product>> GetAllAsync(
-    string? search,
-    decimal? price,
-    CancellationToken cancellationToken = default)
+        string? search,
+        decimal? price,
+        CancellationToken cancellationToken = default)
     {
-        var query = _context.Products.AsQueryable();
+        var query = _context.Products
+            .Include(p => p.ProductType)
+            .Include(p => p.ProductTags)
+            .Include(p => p.ProductExpiration)
+            .AsQueryable();
 
+        // Search
         if (!string.IsNullOrWhiteSpace(search))
         {
             var normalizedSearch =
@@ -32,20 +37,40 @@ public class ProductRepository : IProductRepository
                     .ToLower()
                     .Replace(" ", "")
                     .Contains(normalizedSearch)
+
                 ||
+
                 p.Description
                     .ToLower()
                     .Replace(" ", "")
-                    .Contains(normalizedSearch));
+                    .Contains(normalizedSearch)
+
+                ||
+
+                p.ProductType.Name
+                    .ToLower()
+                    .Replace(" ", "")
+                    .Contains(normalizedSearch)
+
+                ||
+
+                p.ProductTags.Any(tag =>
+                    tag.Name
+                        .ToLower()
+                        .Replace(" ", "")
+                        .Contains(normalizedSearch))
+            );
         }
 
+        // Price
         if (price.HasValue)
         {
             query = query.Where(p =>
                 p.Price == price.Value);
         }
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.ToListAsync(
+            cancellationToken);
     }
 
     public async Task<Product?> GetByIdAsync(
@@ -53,6 +78,9 @@ public class ProductRepository : IProductRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.Products
+            .Include(p => p.ProductType)
+            .Include(p => p.ProductTags)
+            .Include(p => p.ProductExpiration)
             .FirstOrDefaultAsync(
                 p => p.Id == id,
                 cancellationToken);
