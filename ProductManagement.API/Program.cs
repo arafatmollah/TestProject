@@ -52,7 +52,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<
     IPasswordHasher<User>,
     PasswordHasher<User>>();
+
+
 builder.Services.AddMemoryCache();
+
+
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())

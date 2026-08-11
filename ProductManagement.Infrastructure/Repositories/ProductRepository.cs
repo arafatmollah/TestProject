@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ProductManagement.Application.Common;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Infrastructure.Data;
@@ -15,22 +16,33 @@ public class ProductRepository : IProductRepository
     }
 
     public async Task<List<Product>> GetAllAsync(
-     string? search,
-     decimal? price,
-     CancellationToken cancellationToken = default)
+    string? search,
+    decimal? price,
+    CancellationToken cancellationToken = default)
     {
         var query = _context.Products.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
+            var normalizedSearch =
+                SearchHelper.Normalize(search);
+
             query = query.Where(p =>
-                p.Name.Contains(search) ||
-                p.Description.Contains(search));
+                p.Name
+                    .ToLower()
+                    .Replace(" ", "")
+                    .Contains(normalizedSearch)
+                ||
+                p.Description
+                    .ToLower()
+                    .Replace(" ", "")
+                    .Contains(normalizedSearch));
         }
 
         if (price.HasValue)
         {
-            query = query.Where(p => p.Price == price.Value);
+            query = query.Where(p =>
+                p.Price == price.Value);
         }
 
         return await query.ToListAsync(cancellationToken);

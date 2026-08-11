@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 
 namespace ProductManagement.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ProductController : ControllerBase
@@ -15,6 +17,7 @@ public class ProductController : ControllerBase
         _productService = productService;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll(
     [FromQuery] string? search, decimal?price,
@@ -27,6 +30,7 @@ public class ProductController : ControllerBase
         return Ok(products);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -37,6 +41,7 @@ public class ProductController : ControllerBase
 
         return Ok(product);
     }
+
 
     [HttpPost]
     public async Task<IActionResult> Create(
