@@ -35,6 +35,7 @@ public class AuthService : IAuthService
         {
             Id = Guid.NewGuid(),
             Email = dto.Email,
+            Role = "User",
             CreatedAt = DateTime.UtcNow
         };
 
