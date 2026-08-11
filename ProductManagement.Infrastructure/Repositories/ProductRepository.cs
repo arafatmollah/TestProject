@@ -15,15 +15,22 @@ public class ProductRepository : IProductRepository
     }
 
     public async Task<List<Product>> GetAllAsync(
-        string? search,
-        CancellationToken cancellationToken = default)
+     string? search,
+     decimal? price,
+     CancellationToken cancellationToken = default)
     {
         var query = _context.Products.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
             query = query.Where(p =>
-                p.Name.Contains(search));
+                p.Name.Contains(search) ||
+                p.Description.Contains(search));
+        }
+
+        if (price.HasValue)
+        {
+            query = query.Where(p => p.Price == price.Value);
         }
 
         return await query.ToListAsync(cancellationToken);

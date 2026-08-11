@@ -14,16 +14,21 @@ public class ProductService : IProductService
     }
 
     public async Task<List<ProductDto>> GetAllAsync(
-        string? search)
+    string? search,
+    decimal? price,
+    CancellationToken cancellationToken = default)
     {
-        var products = await _repository.GetAllAsync(search);
+        var products = await _repository.GetAllAsync(
+            search,
+            price,
+            cancellationToken);
 
-        return products.Select(x => new ProductDto
+        return products.Select(p => new ProductDto
         {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            Price = x.Price
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price
         }).ToList();
     }
 

@@ -17,9 +17,12 @@ public class ProductController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAll(
-        [FromQuery] string? search)
+    [FromQuery] string? search, decimal?price,
+    CancellationToken cancellationToken)
     {
-        var products = await _productService.GetAllAsync(search);
+        var products = await _productService.GetAllAsync(
+            search,price,
+            cancellationToken);
 
         return Ok(products);
     }

@@ -4,7 +4,9 @@ namespace ProductManagement.Application.Interfaces;
 
 public interface IProductService
 {
-    Task<List<ProductDto>> GetAllAsync(string? search);
+    Task<List<ProductDto>> GetAllAsync(
+    string? search, decimal?price,
+    CancellationToken cancellationToken = default);
 
     Task<ProductDto?> GetByIdAsync(Guid id);
 

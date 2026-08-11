@@ -5,8 +5,9 @@ namespace ProductManagement.Application.Interfaces;
 public interface IProductRepository
 {
     Task<List<Product>> GetAllAsync(
-        string? search,
-        CancellationToken cancellationToken = default);
+     string? search,
+     decimal? price,
+     CancellationToken cancellationToken = default);
 
     Task<Product?> GetByIdAsync(
         Guid id,
