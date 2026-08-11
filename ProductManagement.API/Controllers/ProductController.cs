@@ -31,7 +31,7 @@ public class ProductController : ControllerBase
         return Ok(products);
     }
 
-    [AllowAnonymous]
+    [AllowAnonymous]  
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
