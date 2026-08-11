@@ -43,7 +43,7 @@ public class ProductController : ControllerBase
         return Ok(product);
     }
 
-
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] ProductDto product)

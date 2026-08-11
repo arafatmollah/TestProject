@@ -10,7 +10,9 @@ public interface IProductService
 
     Task<ProductDto?> GetByIdAsync(Guid id);
 
-    Task<ProductDto> CreateAsync(ProductDto product);
+    Task<ProductDto> CreateAsync(
+    ProductDto dto,
+    CancellationToken cancellationToken = default);
 
     Task<bool> UpdateAsync(Guid id, ProductDto product);
 

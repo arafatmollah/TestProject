@@ -66,7 +66,7 @@ public class ProductService : IProductService
         };
     }
 
-    public async Task<ProductDto> CreateAsync(ProductDto dto)
+    public async Task<ProductDto> CreateAsync(ProductDto dto, CancellationToken cancellationToken = default)
     {
         var product = new Product
         {
@@ -74,10 +74,32 @@ public class ProductService : IProductService
             Name = dto.Name,
             Description = dto.Description,
             Price = dto.Price,
+            Quantity = dto.Quantity,
+            ProductTypeId = dto.ProductTypeId,
             CreatedAt = DateTime.UtcNow
         };
 
-        await _repository.AddAsync(product);
+        if (dto.ExpirationDate.HasValue)
+        {
+            product.ProductExpiration = new ProductExpiration
+            {
+                Id = Guid.NewGuid(),
+                ProductId = product.Id,
+                ExpirationDate = dto.ExpirationDate.Value
+            };
+        }
+
+        foreach (var tag in dto.Tags)
+        {
+            product.ProductTags.Add(new ProductTag
+            {
+                Id = Guid.NewGuid(),
+                ProductId = product.Id,
+                Name = tag
+            });
+        }
+
+        await _repository.AddAsync(product, cancellationToken);
 
         dto.Id = product.Id;
 
@@ -113,4 +135,6 @@ public class ProductService : IProductService
 
         return true;
     }
+
+    
 }
