@@ -39,7 +39,20 @@ public class ProductService : IProductService
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
-            Price = p.Price
+            Price = p.Price,
+            Quantity = p.Quantity,
+
+            ProductTypeId = p.ProductTypeId,
+
+            ProductTypeName = p.ProductType?.Name ?? string.Empty,
+
+            ExpirationDate =
+        p.ProductExpiration?.ExpirationDate,
+
+            Tags = p.ProductTags
+        .Select(t => t.Name)
+        .ToList()
+
         }).ToList();
 
         _cache.Set(
