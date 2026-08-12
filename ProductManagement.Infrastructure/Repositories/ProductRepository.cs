@@ -17,6 +17,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<List<Product>> GetAllAsync(
         string? search,
+        string? productType,
         decimal? price,
         CancellationToken cancellationToken = default)
     {
@@ -60,7 +61,16 @@ public class ProductRepository : IProductRepository
                         .Contains(normalizedSearch))
             );
         }
+        if (!string.IsNullOrWhiteSpace(productType))
+        {
+            var normalizedSearch =
+               SearchHelper.Normalize(productType);
 
+            query = query.Where(p => p.ProductType.Name
+                    .ToLower()
+                    .Replace(" ", "")
+                    .Contains(normalizedSearch));
+        }
         
         if (price.HasValue)
         {

@@ -17,6 +17,7 @@ public class ProductService : IProductService
 
     public async Task<List<ProductDto>> GetAllAsync(
     string? search,
+    string? productType,
     decimal? price,
     CancellationToken cancellationToken = default)
     {
@@ -31,6 +32,7 @@ public class ProductService : IProductService
 
         var products = await _repository.GetAllAsync(
             search,
+            productType,
             price,
             cancellationToken);
 
@@ -75,7 +77,9 @@ public class ProductService : IProductService
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = product.Price
+            Price = product.Price,
+            Quantity = product.Quantity,
+            ProductTypeName = product.ProductType?.Name ?? string.Empty,
         };
     }
 

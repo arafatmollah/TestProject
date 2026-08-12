@@ -6,6 +6,7 @@ public interface IProductRepository
 {
     Task<List<Product>> GetAllAsync(
      string? search,
+     string? productType,
      decimal? price,
      CancellationToken cancellationToken = default);
 

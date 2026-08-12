@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Domain.Entities;
 
 namespace ProductManagement.API.Controllers;
 
@@ -21,12 +22,11 @@ public class ProductController : ControllerBase
     [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll(
-    [FromQuery] string? search, decimal?price,
+    [FromQuery] string? search, decimal?price, string? productType,
     CancellationToken cancellationToken)
     {
         var products = await _productService.GetAllAsync(
-            search,price,
-            cancellationToken);
+            search, productType, price);
 
         return Ok(products);
     }
@@ -56,6 +56,7 @@ public class ProductController : ControllerBase
             result);
     }
 
+    [AllowAnonymous]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
         Guid id,
