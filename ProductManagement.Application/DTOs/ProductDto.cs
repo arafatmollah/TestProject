@@ -15,10 +15,10 @@ public class ProductDto
 
         public int Quantity { get; set; }
 
-        // Used when creating/updating
+
         public Guid ProductTypeId { get; set; }
 
-        // Used in response
+
         public string ProductTypeName { get; set; } = string.Empty;
 
         public DateTime? ExpirationDate { get; set; }

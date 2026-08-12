@@ -26,7 +26,6 @@ public class ProductRepository : IProductRepository
             .Include(p => p.ProductExpiration)
             .AsQueryable();
 
-        // Search
         if (!string.IsNullOrWhiteSpace(search))
         {
             var normalizedSearch =
@@ -62,7 +61,7 @@ public class ProductRepository : IProductRepository
             );
         }
 
-        // Price
+        
         if (price.HasValue)
         {
             query = query.Where(p =>

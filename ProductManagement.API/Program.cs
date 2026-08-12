@@ -23,6 +23,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductTypeService, ProductTypeService>();
+builder.Services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
