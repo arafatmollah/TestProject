@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Application.Products.Create;
 using ProductManagement.Domain.Entities;
 
 namespace ProductManagement.API.Controllers;
@@ -13,10 +14,11 @@ namespace ProductManagement.API.Controllers;
 public class ProductController : ControllerBase
 {
     private readonly IProductService _productService;
-
-    public ProductController(IProductService productService)
+    private readonly ICreateProductService _createProductService;
+    public ProductController(IProductService productService, ICreateProductService createProductService)
     {
         _productService = productService;
+        _createProductService = createProductService;
     }
 
     [AllowAnonymous]
@@ -46,14 +48,14 @@ public class ProductController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] ProductDto product)
+    ProductDto dto,
+    CancellationToken cancellationToken)
     {
-        var result = await _productService.CreateAsync(product);
+        var result = await _createProductService.CreateAsync(
+            dto,
+            cancellationToken);
 
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = result.Id },
-            result);
+        return Ok(result);
     }
 
     [AllowAnonymous]

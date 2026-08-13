@@ -8,6 +8,7 @@ using ProductManagement.Application.Auth.Login;
 using ProductManagement.Application.Auth.Register;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Application.Products.Create;
 using ProductManagement.Application.Services;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Domain.Services;
@@ -67,6 +68,9 @@ builder.Services.AddScoped<
 
 
 builder.Services.AddMemoryCache();
+builder.Services.AddScoped<
+    ICreateProductService,
+    CreateProductService>();
 
 
 var app = builder.Build();

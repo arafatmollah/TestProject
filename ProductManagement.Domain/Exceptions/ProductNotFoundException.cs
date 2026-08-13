@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ProductManagement.Domain.Exceptions
 {
-    internal class ProductNotFoundException
+    public class ProductNotFoundException
     {
     }
 }
