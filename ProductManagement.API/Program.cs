@@ -57,8 +57,9 @@ builder.Services.AddAuthentication(
         };
     });
 builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
+builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 builder.Services.AddScoped<
     IPasswordHasher<User>,

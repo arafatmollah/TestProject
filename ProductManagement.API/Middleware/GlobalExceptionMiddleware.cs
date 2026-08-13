@@ -1,52 +1,141 @@
-﻿using System.Net;
+﻿using FluentValidation;
+using System.Net;
 using System.Text.Json;
 
-namespace ProductManagement.API.Middleware
+namespace ProductManagement.API.Middleware;
+
+public class GlobalExceptionMiddleware
 {
-    public class GlobalExceptionMiddleware
+    private readonly RequestDelegate _next;
+    private readonly ILogger<GlobalExceptionMiddleware> _logger;
+
+    public GlobalExceptionMiddleware(
+        RequestDelegate next,
+        ILogger<GlobalExceptionMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<GlobalExceptionMiddleware> _logger;
+        _next = next;
+        _logger = logger;
+    }
 
-        public GlobalExceptionMiddleware(
-            RequestDelegate next,
-            ILogger<GlobalExceptionMiddleware> logger)
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
         {
-            _next = next;
-            _logger = logger;
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "An unhandled exception occurred.");
+
+            await HandleExceptionAsync(context, ex);
+        }
+    }
+
+    private static async Task HandleExceptionAsync(
+        HttpContext context,
+        Exception exception)
+    {
+        if (context.Response.HasStarted)
+        {
+            return;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        context.Response.Clear();
+        context.Response.ContentType = "application/json";
+
+        var (statusCode, message, errors) = GetExceptionDetails(exception);
+
+        context.Response.StatusCode = statusCode;
+
+        var response = new
         {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception arrise an unhandled situation");
+            statusCode,
+            message,
+            errors
+        };
 
-                await HandleExceptionAsync(context, ex);
-            }
-        }
+        await context.Response.WriteAsync(
+            JsonSerializer.Serialize(response));
+    }
 
-        private static async Task HandleExceptionAsync(
-            HttpContext context,
-            Exception exception)
+    private static (
+        int StatusCode,
+        string Message,
+        object? Errors
+    ) GetExceptionDetails(Exception exception)
+    {
+        return exception switch
         {
-            context.Response.ContentType = "application/json";
+            ValidationException validationException =>
+                (
+                    (int)HttpStatusCode.BadRequest,
+                    "Validation failed.",
+                    validationException.Errors
+                        .GroupBy(x => x.PropertyName)
+                        .ToDictionary(
+                            x => x.Key,
+                            x => x.Select(e => e.ErrorMessage).ToArray())
+                ),
 
-            context.Response.StatusCode =
-                (int)HttpStatusCode.InternalServerError;
+       
+            KeyNotFoundException =>
+                (
+                    (int)HttpStatusCode.NotFound,
+                    exception.Message,
+                    null
+                ),
 
-            var response = new
-            {
-                statusCode = context.Response.StatusCode,
-                message = "An unexpected error occurred."
-            };
+   
+            UnauthorizedAccessException =>
+                (
+                    (int)HttpStatusCode.Unauthorized,
+                    string.IsNullOrWhiteSpace(exception.Message)
+                        ? "Unauthorized."
+                        : exception.Message,
+                    null
+                ),
 
-            await context.Response.WriteAsync(
-                JsonSerializer.Serialize(response));
-        }
+ 
+            ArgumentException =>
+                (
+                    (int)HttpStatusCode.BadRequest,
+                    exception.Message,
+                    null
+                ),
+
+       
+            FormatException =>
+                (
+                    (int)HttpStatusCode.BadRequest,
+                    exception.Message,
+                    null
+                ),
+
+      
+            InvalidOperationException =>
+                (
+                    (int)HttpStatusCode.BadRequest,
+                    exception.Message,
+                    null
+                ),
+
+         
+            InvalidDataException =>
+                (
+                    (int)HttpStatusCode.Conflict,
+                    exception.Message,
+                    null
+                ),
+
+        
+            _ =>
+                (
+                    (int)HttpStatusCode.InternalServerError,
+                    "An unexpected error occurred.",
+                    null
+                )
+        };
     }
 }

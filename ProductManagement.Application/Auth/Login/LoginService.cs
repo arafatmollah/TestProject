@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Domain.Entities;
@@ -12,24 +13,28 @@ public class LoginService : ILogInService
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IJwtService _jwtService;
     private readonly AuthenticationService _authenticationService;
+    private readonly IValidator<LoginDto> _validator;
 
     public LoginService(
         IUserRepository userRepository,
         IPasswordHasher<User> passwordHasher,
         IJwtService jwtService,
+        IValidator<LoginDto> validator,
         AuthenticationService authenticationService)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
+        _validator = validator;
         _authenticationService = authenticationService;
     }
 
-    public async Task<LogInResponseDto> LoginAsync(
-        LoginDto dto)
+    public async Task<LogInResponseDto> LoginAsync(LoginDto dto)
     {
-        var user = await _userRepository.GetByEmailAsync(
-            dto.Email);
+       
+        await _validator.ValidateAndThrowAsync(dto);
+
+        var user = await _userRepository.GetByEmailAsync(dto.Email);
 
         if (user == null)
         {
@@ -37,20 +42,30 @@ public class LoginService : ILogInService
                 "Invalid email or password.");
         }
 
-        var result = _passwordHasher.VerifyHashedPassword(
+
+        var passwordResult = _passwordHasher.VerifyHashedPassword(
             user,
             user.PasswordHash,
             dto.Password);
 
         var passwordValid =
-            result != PasswordVerificationResult.Failed;
+            passwordResult != PasswordVerificationResult.Failed;
 
+  
         _authenticationService.Authenticate(
             user,
             passwordValid);
 
+        if (!passwordValid)
+        {
+            throw new InvalidOperationException(
+                "Invalid email or password.");
+        }
+
+        
         var token = _jwtService.GenerateToken(user);
 
+        
         return new LogInResponseDto
         {
             Email = user.Email,

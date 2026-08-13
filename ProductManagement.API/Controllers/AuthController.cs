@@ -9,13 +9,12 @@ namespace ProductManagement.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
     private readonly IRegisterService _registerService;
     private readonly ILogInService _loginService;
 
-    public AuthController(IAuthService authService, IRegisterService registerService, ILogInService logInService)
+    public AuthController(IRegisterService registerService, ILogInService logInService)
     {
-        _authService = authService;
+       
         _registerService = registerService;
         _loginService = logInService;
     }
@@ -44,11 +43,21 @@ public class AuthController : ControllerBase
         RegisterDto dto,
         CancellationToken cancellationToken)
     {
-        var result = await _registerService.RegisterAsync(
-            dto,
-            cancellationToken);
+        try
+        {
+            var result = await _registerService.RegisterAsync(
+                dto,
+                cancellationToken);
 
-        return Ok(result);
+            return Ok(result);
+        }
+        catch(InvalidProgramException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
     }
     //[HttpPost("login")]
     //public async Task<IActionResult> Login(
@@ -72,7 +81,13 @@ public class AuthController : ControllerBase
         LoginDto dto)
     {
         var result = await _loginService.LoginAsync(dto);
-
+        if (result == null)
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid email or password."
+            });
+        }
         return Ok(result);
     }
 }
