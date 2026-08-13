@@ -9,32 +9,44 @@ namespace ProductManagement.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IRegisterService _registerService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, IRegisterService registerService)
     {
         _authService = authService;
+        _registerService = registerService;
     }
 
+    //[HttpPost("register")]
+    //public async Task<IActionResult> Register(
+    //    RegisterDto dto)
+    //{
+    //    try
+    //    {
+    //        var result =
+    //            await _authService.RegisterAsync(dto);
+
+    //        return Ok(result);
+    //    }
+    //    catch (InvalidOperationException ex)
+    //    {
+    //        return BadRequest(new
+    //        {
+    //            message = ex.Message
+    //        });
+    //    }
+    //}
     [HttpPost("register")]
     public async Task<IActionResult> Register(
-        RegisterDto dto)
+        RegisterDto dto,
+        CancellationToken cancellationToken)
     {
-        try
-        {
-            var result =
-                await _authService.RegisterAsync(dto);
+        var result = await _registerService.RegisterAsync(
+            dto,
+            cancellationToken);
 
-            return Ok(result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new
-            {
-                message = ex.Message
-            });
-        }
+        return Ok(result);
     }
-
     [HttpPost("login")]
     public async Task<IActionResult> Login(
         LoginDto dto)

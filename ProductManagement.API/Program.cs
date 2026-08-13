@@ -2,9 +2,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ProductManagement.API.Middleware;
+using ProductManagement.Application.Auth.Register;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Application.Services;
 using ProductManagement.Domain.Entities;
+using ProductManagement.Domain.Services;
 using ProductManagement.Infrastructure.Data;
 using ProductManagement.Infrastructure.Repositories;
 using ProductManagement.Infrastructure.Services;
@@ -20,7 +23,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<RegistrationService>();
 
+builder.Services.AddScoped<IRegisterService, RegisterService>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductTypeService, ProductTypeService>();
@@ -65,7 +70,7 @@ var app = builder.Build();
 //{
 //    app.MapOpenApi();
 //}
-
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
