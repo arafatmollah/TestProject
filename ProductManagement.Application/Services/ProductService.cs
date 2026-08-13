@@ -2,17 +2,19 @@ using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
+using ProductManagement.Domain.Services;
 namespace ProductManagement.Application.Services;
 
 public class ProductService : IProductService
 {
     private readonly IProductRepository _repository;
     private readonly IMemoryCache _cache;
-
-    public ProductService(IProductRepository repository, IMemoryCache cache)
+    private readonly ProductDomainService _productDomainService;
+    public ProductService(IProductRepository repository, IMemoryCache cache, ProductDomainService productDomainService)
     {
         _repository = repository;
         _cache = cache;
+        _productDomainService = productDomainService;
     }
 
     public async Task<List<ProductDto>> GetAllAsync(
@@ -85,16 +87,12 @@ public class ProductService : IProductService
 
     public async Task<ProductDto> CreateAsync(ProductDto dto, CancellationToken cancellationToken = default)
     {
-        var product = new Product
-        {
-            Id = Guid.NewGuid(),
-            Name = dto.Name,
-            Description = dto.Description,
-            Price = dto.Price,
-            Quantity = dto.Quantity,
-            ProductTypeId = dto.ProductTypeId,
-            CreatedAt = DateTime.UtcNow
-        };
+        var product = _productDomainService.CreateProduct(
+    dto.Name,
+    dto.Description,
+    dto.Price,
+    dto.Quantity,
+    dto.ProductTypeId);
 
         if (dto.ExpirationDate.HasValue)
         {

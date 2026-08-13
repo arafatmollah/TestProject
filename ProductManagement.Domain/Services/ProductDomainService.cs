@@ -1,10 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ProductManagement.Domain.Entities;
 
-namespace ProductManagement.Domain.Services
+namespace ProductManagement.Domain.Services;
+
+public class ProductDomainService
 {
-    internal class ProductService
+    public Product CreateProduct(
+        string name,
+        string description,
+        decimal price,
+        int quantity,
+        Guid productTypeId)
     {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException(
+                "Product name is required.");
+        }
+
+        if (price < 0)
+        {
+            throw new InvalidOperationException(
+                "Product price cannot be negative.");
+        }
+
+        return new Product
+        {
+            Id = Guid.NewGuid(),
+            Name = name,
+            Description = description,
+            Price = price,
+            Quantity = quantity,
+            ProductTypeId = productTypeId,
+            CreatedAt = DateTime.UtcNow
+        };
     }
 }
