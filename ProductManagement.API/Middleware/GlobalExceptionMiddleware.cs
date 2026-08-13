@@ -24,7 +24,7 @@ namespace ProductManagement.API.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred.");
+                _logger.LogError(ex, "Exception arrise an unhandled situation");
 
                 await HandleExceptionAsync(context, ex);
             }

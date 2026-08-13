@@ -1,9 +1,12 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProductManagement.API.Middleware;
+using ProductManagement.Application.Auth.Login;
 using ProductManagement.Application.Auth.Register;
+using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Application.Services;
 using ProductManagement.Domain.Entities;
@@ -26,7 +29,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<RegistrationService>();
 
 builder.Services.AddScoped<IRegisterService, RegisterService>();
-
+builder.Services.AddScoped<ILogInService, LoginService>();
+builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductTypeService, ProductTypeService>();
 builder.Services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
@@ -52,7 +56,7 @@ builder.Services.AddAuthentication(
                     builder.Configuration["Jwt:Key"]!))
         };
     });
-
+builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
