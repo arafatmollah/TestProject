@@ -1,4 +1,5 @@
-﻿using ProductManagement.Application.DTOs;
+﻿using FluentValidation;
+using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Domain.Services;
@@ -9,19 +10,25 @@ public class CreateProductService : ICreateProductService
 {
     private readonly IProductRepository _repository;
     private readonly ProductDomainService _productDomainService;
-
+    private readonly IValidator<CreateProductDto> _validator;
     public CreateProductService(
         IProductRepository repository,
-        ProductDomainService productDomainService)
+        ProductDomainService productDomainService,
+        IValidator<CreateProductDto> validator)
     {
         _repository = repository;
         _productDomainService = productDomainService;
+        _validator = validator;
     }
 
     public async Task<ProductDto> CreateAsync(
-        ProductDto dto,
-        CancellationToken cancellationToken = default)
+     CreateProductDto dto,
+     CancellationToken cancellationToken = default)
     {
+        await _validator.ValidateAndThrowAsync(
+    dto,
+    cancellationToken);
+
         var product = _productDomainService.CreateProduct(
             dto.Name,
             dto.Description,

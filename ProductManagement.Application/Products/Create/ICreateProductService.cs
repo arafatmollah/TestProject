@@ -5,6 +5,6 @@ namespace ProductManagement.Application.Products.Create;
 public interface ICreateProductService
 {
     Task<ProductDto> CreateAsync(
-        ProductDto dto,
+        CreateProductDto dto,
         CancellationToken cancellationToken = default);
 }

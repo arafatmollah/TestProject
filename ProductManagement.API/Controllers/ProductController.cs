@@ -80,7 +80,7 @@ public async Task<IActionResult> GetAll(
     [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Create(
-    ProductDto dto,
+    CreateProductDto dto,
     CancellationToken cancellationToken)
     {
         var result = await _createProductService.CreateAsync(
