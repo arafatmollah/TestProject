@@ -34,4 +34,34 @@ public class ProductDomainService
             CreatedAt = DateTime.UtcNow
         };
     }
+    public void UpdateProduct(
+    Product product,
+    string name,
+    string description,
+    decimal price,
+    int quantity)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new InvalidOperationException(
+                "Product name is required.");
+        }
+
+        if (price < 0)
+        {
+            throw new InvalidOperationException(
+                "Product price cannot be negative.");
+        }
+
+        if (quantity < 0)
+        {
+            throw new InvalidOperationException(
+                "Product quantity cannot be negative.");
+        }
+
+        product.Name = name;
+        product.Description = description;
+        product.Price = price;
+        product.Quantity = quantity;
+    }
 }

@@ -9,6 +9,10 @@ using ProductManagement.Application.Auth.Register;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Application.Products.Create;
+using ProductManagement.Application.Products.Delete;
+using ProductManagement.Application.Products.Get;
+using ProductManagement.Application.Products.GetById;
+using ProductManagement.Application.Products.Update;
 using ProductManagement.Application.Services;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Domain.Services;
@@ -71,8 +75,18 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<
     ICreateProductService,
     CreateProductService>();
-
-
+builder.Services.AddScoped<
+    IGetProductsService,
+    GetProductsService>();
+builder.Services.AddScoped<
+    IGetProductByIdService,
+    GetProductByIdService>();
+builder.Services.AddScoped<
+    IUpdateProductService,
+    UpdateProductService>();
+builder.Services.AddScoped<
+    IDeleteProductService,
+    DeleteProductService>();
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())
