@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Application.ProductType.CreateProductType;
 using ProductManagement.Application.Services;
 
 namespace ProductManagement.API.Controllers
@@ -12,9 +13,11 @@ namespace ProductManagement.API.Controllers
     public class ProductTypeController : ControllerBase
     {
         private readonly IProductTypeService _productTypeService;
-        public ProductTypeController(IProductTypeService productTypeService)
+        private readonly ICreateProductType _createProductTypeService;
+        public ProductTypeController(IProductTypeService productTypeService, ICreateProductType createProductTypeService)
         {
             _productTypeService = productTypeService;
+            _createProductTypeService = createProductTypeService;
         }
         
         [HttpGet]
@@ -39,7 +42,7 @@ namespace ProductManagement.API.Controllers
         public async Task<IActionResult> Create(
         [FromBody] ProductTypeDto productType)
         {
-            var result = await _productTypeService.CreateAsync(productType);
+            var result = await _createProductTypeService.CreateAsync(productType);
 
             return CreatedAtAction(
                 nameof(GetById),

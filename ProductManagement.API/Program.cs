@@ -13,6 +13,7 @@ using ProductManagement.Application.Products.Delete;
 using ProductManagement.Application.Products.Get;
 using ProductManagement.Application.Products.GetById;
 using ProductManagement.Application.Products.Update;
+using ProductManagement.Application.ProductType.CreateProductType;
 using ProductManagement.Application.Services;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Domain.Services;
@@ -92,6 +93,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IValidator<UpdateProductDto>,
     UpdateProductValidator>();
+builder.Services.AddScoped<
+    ICreateProductType,
+    CreateProductTypeService>();
+builder.Services.AddScoped<ProductTypeDomainService>();
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())
