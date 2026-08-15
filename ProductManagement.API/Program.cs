@@ -14,6 +14,8 @@ using ProductManagement.Application.Products.Get;
 using ProductManagement.Application.Products.GetById;
 using ProductManagement.Application.Products.Update;
 using ProductManagement.Application.ProductType.CreateProductType;
+using ProductManagement.Application.ProductType.GetByIdProductType;
+using ProductManagement.Application.ProductType.GetProductType;
 using ProductManagement.Application.Services;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Domain.Services;
@@ -96,6 +98,8 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ICreateProductType,
     CreateProductTypeService>();
+builder.Services.AddScoped<IGetProductType, GetProductTypeService>();
+builder.Services.AddScoped<IGetProductTypeById, GetProductTypeByIdService>();
 builder.Services.AddScoped<ProductTypeDomainService>();
 var app = builder.Build();
 

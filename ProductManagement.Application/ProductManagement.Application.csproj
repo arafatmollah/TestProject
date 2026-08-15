@@ -11,9 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ProductType\GetProductType\" />
     <Folder Include="ProductType\DeleteProductType\" />
-    <Folder Include="ProductType\GetByIdProductType\" />
     <Folder Include="ProductType\UpdateProductType\" />
   </ItemGroup>
 

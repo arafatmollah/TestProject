@@ -5,7 +5,7 @@ namespace ProductManagement.Application.Interfaces
     public interface IProductTypeService
     {
         Task<List<ProductTypeDto>> GetAllAsync();
-        Task<ProductTypeDto?> GetByIdAsync(Guid id);
+        
         Task<ProductTypeDto> CreateAsync(ProductTypeDto productTypeDto);
         Task<bool> UpdateAsync(Guid id, ProductTypeDto product);
         Task<bool> DeleteAsync(Guid id);
