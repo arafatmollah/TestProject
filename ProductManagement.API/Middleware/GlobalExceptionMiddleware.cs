@@ -55,7 +55,7 @@ public class GlobalExceptionMiddleware
         return exception switch
         {
             BusinessRuleException => (int)HttpStatusCode.BadRequest,
-
+            ProductNotFoundException => (int)HttpStatusCode.NotFound,
             KeyNotFoundException => (int)HttpStatusCode.NotFound,
 
             UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
