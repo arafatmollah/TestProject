@@ -11,14 +11,17 @@ public class CreateProductService : ICreateProductService
     private readonly IProductRepository _repository;
     private readonly ProductDomainService _productDomainService;
     private readonly IValidator<CreateProductDto> _validator;
+    private readonly IUnitOfWork _unitOfWork;
     public CreateProductService(
         IProductRepository repository,
         ProductDomainService productDomainService,
-        IValidator<CreateProductDto> validator)
+        IValidator<CreateProductDto> validator,
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _productDomainService = productDomainService;
         _validator = validator;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ProductDto> CreateAsync(
@@ -59,6 +62,8 @@ public class CreateProductService : ICreateProductService
         await _repository.AddAsync(
             product,
             cancellationToken);
+        await _unitOfWork.SaveChangesAsync(
+    cancellationToken);
 
         return new ProductDto
         {

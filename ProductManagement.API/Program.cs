@@ -23,6 +23,7 @@ using ProductManagement.Domain.Services;
 using ProductManagement.Infrastructure.Data;
 using ProductManagement.Infrastructure.Repositories;
 using ProductManagement.Infrastructure.Services;
+//using ProductManagement.Infrastructure.Data;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -102,6 +103,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<IGetProductType, GetProductTypeService>();
 builder.Services.AddScoped<IGetProductTypeById, GetProductTypeByIdService>();
 builder.Services.AddScoped<ProductTypeDomainService>();
+builder.Services.AddScoped<
+    IUnitOfWork,
+    UnitOfWork>();
 builder.Services.AddScoped<IDeleteProductType, DeleteProductTypeService>();
 var app = builder.Build();
 

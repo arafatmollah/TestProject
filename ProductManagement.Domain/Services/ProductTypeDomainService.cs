@@ -22,5 +22,16 @@ namespace ProductManagement.Domain.Services
                 Name = name
             };
         }
+        public void UpdateProductType(
+    ProductType product,
+    string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new InvalidOperationException(
+                    "Product name is required.");
+            }
+            product.Name = name;
+        }
     }
 }
