@@ -1,5 +1,6 @@
 ﻿using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Domain.Exceptions;
 
 namespace ProductManagement.Application.Products.GetById;
 
@@ -13,7 +14,7 @@ public class GetProductByIdService : IGetProductByIdService
         _repository = repository;
     }
 
-    public async Task<ProductDto?> GetByIdAsync(
+    public async Task<ProductDto> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -22,7 +23,10 @@ public class GetProductByIdService : IGetProductByIdService
             cancellationToken);
 
         if (product == null)
-            return null;
+        {
+            throw new ProductNotFoundException(
+                "Product not found.");
+        }
 
         return new ProductDto
         {
@@ -32,12 +36,10 @@ public class GetProductByIdService : IGetProductByIdService
             Price = product.Price,
             Quantity = product.Quantity,
             ProductTypeId = product.ProductTypeId,
-            ProductTypeName =
-                product.ProductType?.Name ?? string.Empty,
-            ExpirationDate =
-                product.ProductExpiration?.ExpirationDate,
+            ProductTypeName = product.ProductType?.Name ?? string.Empty,
+            ExpirationDate = product.ProductExpiration?.ExpirationDate,
             Tags = product.ProductTags
-                .Select(t => t.Name)
+                .Select(x => x.Name)
                 .ToList()
         };
     }

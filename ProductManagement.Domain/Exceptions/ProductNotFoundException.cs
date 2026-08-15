@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace ProductManagement.Domain.Exceptions;
 
-namespace ProductManagement.Domain.Exceptions
+public class ProductNotFoundException : DomainException
 {
-    public class ProductNotFoundException
+    public ProductNotFoundException(string message)
+        : base(message)
     {
     }
 }

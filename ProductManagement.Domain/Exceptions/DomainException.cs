@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace ProductManagement.Domain.Exceptions;
 
-namespace ProductManagement.Domain.Exceptions
+public class DomainException : Exception
 {
-    public class DomainException
+    public DomainException(string message)
+        : base(message)
     {
     }
 }

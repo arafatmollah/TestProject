@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
-
+using ProductManagement.Domain.Exceptions;
 namespace ProductManagement.API.Middleware;
 
 public class GlobalExceptionMiddleware
@@ -54,6 +54,8 @@ public class GlobalExceptionMiddleware
     {
         return exception switch
         {
+            BusinessRuleException => (int)HttpStatusCode.BadRequest,
+
             KeyNotFoundException => (int)HttpStatusCode.NotFound,
 
             UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
