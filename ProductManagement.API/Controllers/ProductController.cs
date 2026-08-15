@@ -17,15 +17,13 @@ namespace ProductManagement.API.Controllers;
 [ApiController]
 public class ProductController : ControllerBase
 {
-    private readonly IProductService _productService;
     private readonly ICreateProductService _createProductService;
     private readonly IGetProductsService _getProductsService;
     private readonly IGetProductByIdService _getProductByIdService;
     private readonly IUpdateProductService _updateProductService;
     private readonly IDeleteProductService _deleteProductService;
-    public ProductController(IProductService productService, ICreateProductService createProductService, IGetProductsService getProductsService, IGetProductByIdService getProductByIdService, IUpdateProductService updateProductService, IDeleteProductService deleteProductService)
+    public ProductController(ICreateProductService createProductService, IGetProductsService getProductsService, IGetProductByIdService getProductByIdService, IUpdateProductService updateProductService, IDeleteProductService deleteProductService)
     {
-        _productService = productService;
         _createProductService = createProductService;
         _getProductsService = getProductsService;
         _getProductByIdService = getProductByIdService;
@@ -51,17 +49,7 @@ public async Task<IActionResult> GetAll(
     return Ok(result);
 }
 
-    //[AllowAnonymous]  
-    //[HttpGet("{id:guid}")]
-    //public async Task<IActionResult> GetById(Guid id)
-    //{
-    //    var product = await _productService.GetByIdAsync(id);
-
-    //    if (product == null)
-    //        return NotFound();
-
-    //    return Ok(product);
-    //}
+    [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(
     Guid id,
@@ -83,26 +71,24 @@ public async Task<IActionResult> GetAll(
     CreateProductDto dto,
     CancellationToken cancellationToken)
     {
-        var result = await _createProductService.CreateAsync(
-            dto,
-            cancellationToken);
+        try
+        {
+            var result = await _createProductService.CreateAsync(
+           dto,
+           cancellationToken);
 
-        return Ok(result);
+            return Ok(result);
+        }
+        catch(InvalidProgramException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
     }
 
-    //[AllowAnonymous]
-    //[HttpPut("{id:guid}")]
-    //public async Task<IActionResult> Update(
-    //    Guid id,
-    //    [FromBody] ProductDto product)
-    //{
-    //    var result = await _productService.UpdateAsync(id, product);
-
-    //    if (!result)
-    //        return NotFound();
-
-    //    return NoContent();
-    //}
+    [AllowAnonymous]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
     Guid id,
@@ -119,16 +105,8 @@ public async Task<IActionResult> GetAll(
 
         return NoContent();
     }
-    //[HttpDelete("{id:guid}")]
-    //public async Task<IActionResult> Delete(Guid id)
-    //{
-    //    var result = await _productService.DeleteAsync(id);
 
-    //    if (!result)
-    //        return NotFound();
-
-    //    return NoContent();
-    //}
+    [AllowAnonymous]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(
     Guid id,
