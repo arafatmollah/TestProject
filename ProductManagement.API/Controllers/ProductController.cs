@@ -92,7 +92,7 @@ public async Task<IActionResult> GetAll(
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
     Guid id,
-    ProductDto dto,
+    UpdateProductDto dto,
     CancellationToken cancellationToken)
     {
         var result = await _updateProductService.UpdateAsync(

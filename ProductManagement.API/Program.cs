@@ -89,6 +89,9 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IValidator<CreateProductDto>,
     CreateProductValidator>();
+builder.Services.AddScoped<
+    IValidator<UpdateProductDto>,
+    UpdateProductValidator>();
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())

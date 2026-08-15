@@ -1,13 +1,19 @@
-﻿using ProductManagement.Domain.Entities;
+﻿using ProductTypeEntity = ProductManagement.Domain.Entities.ProductType;
 
-namespace ProductManagement.Application.Interfaces
+namespace ProductManagement.Application.Interfaces;
+
+public interface IProductTypeRepository
 {
-    public interface IProductTypeRepository
-    {
-        Task<List<ProductType>> GetAllAsync();
-        Task<ProductType?> GetByIdAsync(Guid id);
-        Task<ProductType> CreateAsync(ProductType productType);
-        Task<bool> UpdateAsync(Guid id, ProductType productType);
-        Task<bool> DeleteAsync(Guid id);
-    }
+    Task<List<ProductTypeEntity>> GetAllAsync();
+
+    Task<ProductTypeEntity?> GetByIdAsync(Guid id);
+
+    Task<ProductTypeEntity> CreateAsync(
+        ProductTypeEntity productType);
+
+    Task<bool> UpdateAsync(
+        Guid id,
+        ProductTypeEntity productType);
+
+    Task<bool> DeleteAsync(Guid id);
 }

@@ -2,7 +2,8 @@
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Domain.Entities;
-
+using ProductTypeEntity =
+    ProductManagement.Domain.Entities.ProductType;
 namespace ProductManagement.Application.Services
 {
     public class ProductTypeService : IProductTypeService
@@ -76,7 +77,7 @@ namespace ProductManagement.Application.Services
         public async Task<ProductTypeDto> CreateAsync(
             ProductTypeDto productTypeDto)
         {
-            var productType = new ProductType
+            var productType = new ProductTypeEntity
             {
                 Id = Guid.NewGuid(),
                 Name = productTypeDto.Name,
@@ -100,7 +101,7 @@ namespace ProductManagement.Application.Services
             Guid id,
             ProductTypeDto product)
         {
-            var productType = new ProductType
+            var productType = new ProductTypeEntity
             {
                 Id = id,
                 Name = product.Name,
