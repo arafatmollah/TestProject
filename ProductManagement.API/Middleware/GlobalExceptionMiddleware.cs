@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 
 namespace ProductManagement.API.Middleware;
@@ -25,9 +24,7 @@ public class GlobalExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                ex,
-                "An unhandled exception occurred.");
+            _logger.LogError(ex, "An unhandled exception occurred.");
 
             await HandleExceptionAsync(context, ex);
         }
@@ -38,104 +35,55 @@ public class GlobalExceptionMiddleware
         Exception exception)
     {
         if (context.Response.HasStarted)
-        {
             return;
-        }
 
-        context.Response.Clear();
+        context.Response.StatusCode = GetStatusCode(exception);
         context.Response.ContentType = "application/json";
-
-        var (statusCode, message, errors) = GetExceptionDetails(exception);
-
-        context.Response.StatusCode = statusCode;
 
         var response = new
         {
-            statusCode,
-            message,
-            errors
+            statusCode = context.Response.StatusCode,
+            message = GetMessage(exception)
         };
 
         await context.Response.WriteAsync(
             JsonSerializer.Serialize(response));
     }
 
-    private static (
-        int StatusCode,
-        string Message,
-        object? Errors
-    ) GetExceptionDetails(Exception exception)
+    private static int GetStatusCode(Exception exception)
     {
         return exception switch
         {
-            ValidationException validationException =>
-                (
-                    (int)HttpStatusCode.BadRequest,
-                    "Validation failed.",
-                    validationException.Errors
-                        .GroupBy(x => x.PropertyName)
-                        .ToDictionary(
-                            x => x.Key,
-                            x => x.Select(e => e.ErrorMessage).ToArray())
-                ),
+            KeyNotFoundException => (int)HttpStatusCode.NotFound,
 
-       
-            KeyNotFoundException =>
-                (
-                    (int)HttpStatusCode.NotFound,
-                    exception.Message,
-                    null
-                ),
+            UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
 
-   
+            ArgumentException => (int)HttpStatusCode.BadRequest,
+
+            FormatException => (int)HttpStatusCode.BadRequest,
+
+            InvalidOperationException => (int)HttpStatusCode.BadRequest,
+
+            InvalidDataException => (int)HttpStatusCode.Conflict,
+
+            _ => (int)HttpStatusCode.InternalServerError
+        };
+    }
+
+    private static string GetMessage(Exception exception)
+    {
+        return exception switch
+        {
             UnauthorizedAccessException =>
-                (
-                    (int)HttpStatusCode.Unauthorized,
-                    string.IsNullOrWhiteSpace(exception.Message)
-                        ? "Unauthorized."
-                        : exception.Message,
-                    null
-                ),
+                string.IsNullOrWhiteSpace(exception.Message)
+                    ? "Unauthorized."
+                    : exception.Message,
 
- 
-            ArgumentException =>
-                (
-                    (int)HttpStatusCode.BadRequest,
-                    exception.Message,
-                    null
-                ),
+            _ when !string.IsNullOrWhiteSpace(exception.Message) =>
+                exception.Message,
 
-       
-            FormatException =>
-                (
-                    (int)HttpStatusCode.BadRequest,
-                    exception.Message,
-                    null
-                ),
-
-      
-            InvalidOperationException =>
-                (
-                    (int)HttpStatusCode.BadRequest,
-                    exception.Message,
-                    null
-                ),
-
-         
-            InvalidDataException =>
-                (
-                    (int)HttpStatusCode.Conflict,
-                    exception.Message,
-                    null
-                ),
-
-        
             _ =>
-                (
-                    (int)HttpStatusCode.InternalServerError,
-                    "An unexpected error occurred.",
-                    null
-                )
+                "An unexpected error occurred."
         };
     }
 }
