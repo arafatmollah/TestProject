@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ProductManagement.Application.ProductType.UpdateProductType
 {
-    internal class UpdateProductTypeService : IUpdateProductTypeService
+    public class UpdateProductTypeService : IUpdateProductTypeService
     {
         private readonly IProductTypeRepository _repository;
         private readonly ProductTypeDomainService _productTypeDomainService;

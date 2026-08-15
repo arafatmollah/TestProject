@@ -17,7 +17,7 @@ using ProductManagement.Application.ProductType.CreateProductType;
 using ProductManagement.Application.ProductType.DeleteProductType;
 using ProductManagement.Application.ProductType.GetByIdProductType;
 using ProductManagement.Application.ProductType.GetProductType;
-using ProductManagement.Application.Services;
+using ProductManagement.Application.ProductType.UpdateProductType;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Domain.Services;
 using ProductManagement.Infrastructure.Data;
@@ -41,7 +41,6 @@ builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<ILogInService, LoginService>();
 builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductTypeService, ProductTypeService>();
 builder.Services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
@@ -106,7 +105,9 @@ builder.Services.AddScoped<ProductTypeDomainService>();
 builder.Services.AddScoped<
     IUnitOfWork,
     UnitOfWork>();
+builder.Services.AddScoped<IUpdateProductTypeService, UpdateProductTypeService>();
 builder.Services.AddScoped<IDeleteProductType, DeleteProductTypeService>();
+
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())

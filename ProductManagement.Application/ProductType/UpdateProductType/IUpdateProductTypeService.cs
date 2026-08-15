@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ProductManagement.Application.ProductType.UpdateProductType
 {
-    internal interface IUpdateProductTypeService
+    public interface IUpdateProductTypeService
     {
         Task<bool> UpdateAsync(Guid id, ProductTypeDto product);
     }

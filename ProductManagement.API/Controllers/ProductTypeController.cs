@@ -5,9 +5,11 @@ using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Application.Products.Get;
 using ProductManagement.Application.ProductType.CreateProductType;
+using ProductManagement.Application.ProductType.DeleteProductType;
 using ProductManagement.Application.ProductType.GetByIdProductType;
 using ProductManagement.Application.ProductType.GetProductType;
-using ProductManagement.Application.Services;
+using ProductManagement.Application.ProductType.UpdateProductType;
+
 
 namespace ProductManagement.API.Controllers
 {
@@ -15,16 +17,20 @@ namespace ProductManagement.API.Controllers
     [ApiController]
     public class ProductTypeController : ControllerBase
     {
-        private readonly IProductTypeService _productTypeService;
+
         private readonly ICreateProductType _createProductTypeService;
         private readonly IGetProductType _getProductType;
         private readonly IGetProductTypeById _getProductTypeById;
-        public ProductTypeController(IProductTypeService productTypeService, ICreateProductType createProductTypeService, IGetProductType getProductType, IGetProductTypeById getProductTypeById)
+        private readonly IUpdateProductTypeService _updateProductTypeService;
+        private readonly IDeleteProductType _deleteProductType;
+        public ProductTypeController(ICreateProductType createProductTypeService, IGetProductType getProductType, IGetProductTypeById getProductTypeById, IUpdateProductTypeService updateProductTypeService, IDeleteProductType deleteProductType)
         {
-            _productTypeService = productTypeService;
+            
             _createProductTypeService = createProductTypeService;
             _getProductType = getProductType;
             _getProductTypeById = getProductTypeById;
+            _updateProductTypeService = updateProductTypeService;
+            _deleteProductType = deleteProductType;
         }
         
         [HttpGet]
@@ -61,7 +67,7 @@ namespace ProductManagement.API.Controllers
        Guid id,
        [FromBody] ProductTypeDto product)
         {
-            var result = await _productTypeService.UpdateAsync(id, product);
+            var result = await _updateProductTypeService.UpdateAsync(id, product);
 
             if (!result)
                 return NotFound();
@@ -72,7 +78,7 @@ namespace ProductManagement.API.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _productTypeService.DeleteAsync(id);
+            var result = await _deleteProductType.DeleteAsync(id);
 
             if (!result)
                 return NotFound();
