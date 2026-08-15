@@ -10,13 +10,15 @@ public class UpdateProductService : IUpdateProductService
     private readonly IProductRepository _repository;
     private readonly ProductDomainService _productDomainService;
     private readonly IValidator<UpdateProductDto> _validator;
+    private readonly IUnitOfWork _unitOfWork;
     public UpdateProductService(
         IProductRepository repository,
-        ProductDomainService productDomainService, IValidator<UpdateProductDto> validator)
+        ProductDomainService productDomainService, IValidator<UpdateProductDto> validator, IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _productDomainService = productDomainService;
         _validator = validator;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<bool> UpdateAsync(
@@ -25,8 +27,8 @@ public class UpdateProductService : IUpdateProductService
         CancellationToken cancellationToken = default)
     {
         await _validator.ValidateAndThrowAsync(
-    dto,
-    cancellationToken);
+     dto,
+     cancellationToken);
 
         var product = await _repository.GetByIdAsync(
             id,
@@ -44,6 +46,9 @@ public class UpdateProductService : IUpdateProductService
 
         await _repository.UpdateAsync(
             product,
+            cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(
             cancellationToken);
 
         return true;
