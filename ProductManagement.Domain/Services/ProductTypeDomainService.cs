@@ -1,37 +1,41 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using ProductManagement.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ProductManagement.Domain.Entities;
+using ProductManagement.Domain.Exceptions;
 
-namespace ProductManagement.Domain.Services
+namespace ProductManagement.Domain.Services;
+
+public class ProductTypeDomainService
 {
-    public class ProductTypeDomainService
+    public ProductType CreateProductType(string name)
     {
-        public ProductType CreateProductType(string name)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new InvalidOperationException(
-                    "Product type name is required.");
-            }
+            throw new BusinessRuleException(
+                "Product type name is required.");
+        }
 
-            return new ProductType
-            {
-                Id = Guid.NewGuid(),
-                Name = name
-            };
-        }
-        public void UpdateProductType(
-    ProductType product,
-    string name)
+        return new ProductType
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new InvalidOperationException(
-                    "Product name is required.");
-            }
-            product.Name = name;
+            Id = Guid.NewGuid(),
+            Name = name.Trim()
+        };
+    }
+
+    public void UpdateProductType(
+        ProductType productType,
+        string name)
+    {
+        if (productType == null)
+        {
+            throw new BusinessRuleException(
+                "Product type is required.");
         }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new BusinessRuleException(
+                "Product type name is required.");
+        }
+
+        productType.Name = name.Trim();
     }
 }
