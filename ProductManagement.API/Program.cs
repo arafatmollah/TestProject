@@ -107,7 +107,9 @@ builder.Services.AddScoped<
     UnitOfWork>();
 builder.Services.AddScoped<IUpdateProductTypeService, UpdateProductTypeService>();
 builder.Services.AddScoped<IDeleteProductType, DeleteProductTypeService>();
-
+builder.Services.AddScoped<
+    IOrderRepository,
+    OrderRepository>();
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())
