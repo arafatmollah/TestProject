@@ -8,6 +8,7 @@ using ProductManagement.Application.Auth.Login;
 using ProductManagement.Application.Auth.Register;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Application.Orders.CreateOrder;
 using ProductManagement.Application.Products.Create;
 using ProductManagement.Application.Products.Delete;
 using ProductManagement.Application.Products.Get;
@@ -68,6 +69,7 @@ builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<ProductDomainService>();
+builder.Services.AddScoped<OrderDomainService>();
 
 builder.Services.AddScoped<
     IPasswordHasher<User>,
@@ -110,6 +112,7 @@ builder.Services.AddScoped<IDeleteProductType, DeleteProductTypeService>();
 builder.Services.AddScoped<
     IOrderRepository,
     OrderRepository>();
+builder.Services.AddScoped<ICreateOrderService, CreateOrderService>();
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())
