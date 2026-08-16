@@ -37,13 +37,14 @@ public class ProductController : ControllerBase
 public async Task<IActionResult> GetAll(
     string? search,
     string? productType,
-    decimal? price,
+    decimal? minPrice, decimal? maxPrice, int page,
+        int pageSize,
     CancellationToken cancellationToken)
 {
     var result = await _getProductsService.GetAllAsync(
         search,
         productType,
-        price,
+        minPrice, maxPrice, page, pageSize,
         cancellationToken);
 
     return Ok(result);

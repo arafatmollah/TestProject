@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProductManagement.Application.Common;
+using ProductManagement.Application.Common.Pagination;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Infrastructure.Data;
@@ -15,10 +16,13 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public async Task<List<Product>> GetAllAsync(
+    public async Task<PagedResult<Product>> GetAllAsync(
         string? search,
         string? productType,
-        decimal? price,
+        decimal? minPrice,
+        decimal?maxPrice,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken = default)
     {
         var query = _context.Products
@@ -71,15 +75,41 @@ public class ProductRepository : IProductRepository
                     .Replace(" ", "")
                     .Contains(normalizedSearch));
         }
-        
-        if (price.HasValue)
+
+        //if (price.HasValue)
+        //{
+        //    query = query.Where(p =>
+        //        p.Price == price.Value);
+        //}
+        if (minPrice.HasValue)
         {
             query = query.Where(p =>
-                p.Price == price.Value);
+                p.Price >= minPrice.Value);
         }
 
-        return await query.ToListAsync(
-            cancellationToken);
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p =>
+                p.Price <= maxPrice.Value);
+        }
+        var totalCount = await query.CountAsync(
+    cancellationToken);
+
+        var products = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Product>
+        {
+            Items = products,
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = (int)Math.Ceiling(
+                totalCount / (double)pageSize)
+        };
+
     }
 
     public async Task<Product?> GetByIdAsync(

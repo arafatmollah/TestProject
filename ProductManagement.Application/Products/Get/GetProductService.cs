@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using ProductManagement.Application.Common.Pagination;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 
@@ -17,18 +18,21 @@ public class GetProductsService : IGetProductsService
         _cache = cache;
     }
 
-    public async Task<List<ProductDto>> GetAllAsync(
+    public async Task<PagedResult<ProductDto>> GetAllAsync(
         string? search,
         string? productType,
-        decimal? price,
+        decimal? minPrice,
+        decimal? maxPrice,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken = default)
     {
         var cacheKey =
-            $"products:{search}:{productType}:{price}";
+            $"products:{search}:{productType}:{minPrice}:{maxPrice}:{page}:{pageSize}";
 
         if (_cache.TryGetValue(
             cacheKey,
-            out List<ProductDto>? cachedProducts))
+            out PagedResult<ProductDto>? cachedProducts))
         {
             return cachedProducts!;
         }
@@ -36,25 +40,39 @@ public class GetProductsService : IGetProductsService
         var products = await _repository.GetAllAsync(
             search,
             productType,
-            price,
+            minPrice,
+            maxPrice,
+            page,
+            pageSize,
             cancellationToken);
 
-        var result = products.Select(p => new ProductDto
+        var items = products.Items
+            .Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                Quantity = p.Quantity,
+                ProductTypeId = p.ProductTypeId,
+                ProductTypeName =
+                    p.ProductType?.Name ?? string.Empty,
+                ExpirationDate =
+                    p.ProductExpiration?.ExpirationDate,
+                Tags = p.ProductTags
+                    .Select(t => t.Name)
+                    .ToList()
+            })
+            .ToList();
+
+        var result = new PagedResult<ProductDto>
         {
-            Id = p.Id,
-            Name = p.Name,
-            Description = p.Description,
-            Price = p.Price,
-            Quantity = p.Quantity,
-            ProductTypeId = p.ProductTypeId,
-            ProductTypeName =
-                p.ProductType?.Name ?? string.Empty,
-            ExpirationDate =
-                p.ProductExpiration?.ExpirationDate,
-            Tags = p.ProductTags
-                .Select(t => t.Name)
-                .ToList()
-        }).ToList();
+            Items = items,
+            Page = products.Page,
+            PageSize = products.PageSize,
+            TotalCount = products.TotalCount,
+            TotalPages = products.TotalPages
+        };
 
         _cache.Set(
             cacheKey,

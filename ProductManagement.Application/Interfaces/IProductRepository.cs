@@ -1,14 +1,18 @@
-﻿using ProductManagement.Domain.Entities;
+﻿using ProductManagement.Application.Common.Pagination;
+using ProductManagement.Domain.Entities;
 
 namespace ProductManagement.Application.Interfaces;
 
 public interface IProductRepository
 {
-    Task<List<Product>> GetAllAsync(
-     string? search,
-     string? productType,
-     decimal? price,
-     CancellationToken cancellationToken = default);
+    Task<PagedResult<Product>> GetAllAsync(
+        string? search,
+        string? productType,
+        decimal? minPrice,
+        decimal? maxPrice,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
 
     Task<Product?> GetByIdAsync(
         Guid id,
