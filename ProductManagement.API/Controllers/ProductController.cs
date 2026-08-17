@@ -34,21 +34,16 @@ public class ProductController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet]
-public async Task<IActionResult> GetAll(
-    string? search,
-    string? productType,
-    decimal? minPrice, decimal? maxPrice, int page,
-        int pageSize,
+    public async Task<IActionResult> GetAll(
+    [FromQuery] ProductFilter filter,
     CancellationToken cancellationToken)
-{
-    var result = await _getProductsService.GetAllAsync(
-        search,
-        productType,
-        minPrice, maxPrice, page, pageSize,
-        cancellationToken);
+    {
+        var result = await _getProductsService.GetAllAsync(
+            filter,
+            cancellationToken);
 
-    return Ok(result);
-}
+        return Ok(result);
+    }
 
     [AllowAnonymous]
     [HttpGet("{id:guid}")]

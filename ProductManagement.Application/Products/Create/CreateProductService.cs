@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using AutoMapper;
+using FluentValidation;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Domain.Entities;
@@ -12,25 +13,29 @@ public class CreateProductService : ICreateProductService
     private readonly ProductDomainService _productDomainService;
     private readonly IValidator<CreateProductDto> _validator;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
     public CreateProductService(
         IProductRepository repository,
         ProductDomainService productDomainService,
         IValidator<CreateProductDto> validator,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IMapper mapper)
     {
         _repository = repository;
         _productDomainService = productDomainService;
         _validator = validator;
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
     public async Task<ProductDto> CreateAsync(
-     CreateProductDto dto,
-     CancellationToken cancellationToken = default)
+        CreateProductDto dto,
+        CancellationToken cancellationToken = default)
     {
         await _validator.ValidateAndThrowAsync(
-    dto,
-    cancellationToken);
+            dto,
+            cancellationToken);
 
         var product = _productDomainService.CreateProduct(
             dto.Name,
@@ -62,22 +67,10 @@ public class CreateProductService : ICreateProductService
         await _repository.AddAsync(
             product,
             cancellationToken);
-        await _unitOfWork.SaveChangesAsync(
-    cancellationToken);
 
-        return new ProductDto
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Description = product.Description,
-            Price = product.Price,
-            Quantity = product.Quantity,
-            ProductTypeId = product.ProductTypeId,
-            ExpirationDate =
-                product.ProductExpiration?.ExpirationDate,
-            Tags = product.ProductTags
-                .Select(x => x.Name)
-                .ToList()
-        };
+        await _unitOfWork.SaveChangesAsync(
+            cancellationToken);
+
+        return _mapper.Map<ProductDto>(product);
     }
 }

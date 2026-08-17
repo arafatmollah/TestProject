@@ -1,4 +1,5 @@
 ﻿using ProductManagement.Application.Common.Pagination;
+using ProductManagement.Application.Products.Get;
 using ProductManagement.Domain.Entities;
 
 namespace ProductManagement.Application.Interfaces;
@@ -6,12 +7,7 @@ namespace ProductManagement.Application.Interfaces;
 public interface IProductRepository
 {
     Task<PagedResult<Product>> GetAllAsync(
-        string? search,
-        string? productType,
-        decimal? minPrice,
-        decimal? maxPrice,
-        int page,
-        int pageSize,
+        ProductFilter filter,
         CancellationToken cancellationToken = default);
 
     Task<Product?> GetByIdAsync(

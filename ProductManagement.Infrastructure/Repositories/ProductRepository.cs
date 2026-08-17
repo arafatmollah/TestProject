@@ -2,6 +2,7 @@
 using ProductManagement.Application.Common;
 using ProductManagement.Application.Common.Pagination;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Application.Products.Get;
 using ProductManagement.Domain.Entities;
 using ProductManagement.Infrastructure.Data;
 
@@ -17,12 +18,7 @@ public class ProductRepository : IProductRepository
     }
 
     public async Task<PagedResult<Product>> GetAllAsync(
-        string? search,
-        string? productType,
-        decimal? minPrice,
-        decimal?maxPrice,
-        int page,
-        int pageSize,
+        ProductFilter filter,
         CancellationToken cancellationToken = default)
     {
         var query = _context.Products
@@ -31,10 +27,10 @@ public class ProductRepository : IProductRepository
             .Include(p => p.ProductExpiration)
             .AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrWhiteSpace(filter.Search))
         {
             var normalizedSearch =
-                SearchHelper.Normalize(search);
+                SearchHelper.Normalize(filter.Search);
 
             query = query.Where(p =>
                 p.Name
@@ -65,10 +61,10 @@ public class ProductRepository : IProductRepository
                         .Contains(normalizedSearch))
             );
         }
-        if (!string.IsNullOrWhiteSpace(productType))
+        if (!string.IsNullOrWhiteSpace(filter.ProductType))
         {
             var normalizedSearch =
-               SearchHelper.Normalize(productType);
+               SearchHelper.Normalize(filter.ProductType);
 
             query = query.Where(p => p.ProductType.Name
                     .ToLower()
@@ -81,33 +77,34 @@ public class ProductRepository : IProductRepository
         //    query = query.Where(p =>
         //        p.Price == price.Value);
         //}
-        if (minPrice.HasValue)
+        if (filter.MinPrice.HasValue)
         {
             query = query.Where(p =>
-                p.Price >= minPrice.Value);
+                p.Price >= filter.MinPrice.Value);
         }
 
-        if (maxPrice.HasValue)
+        if (filter.MaxPrice.HasValue)
         {
             query = query.Where(p =>
-                p.Price <= maxPrice.Value);
+                p.Price <= filter.MaxPrice.Value);
         }
         var totalCount = await query.CountAsync(
     cancellationToken);
 
         var products = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(cancellationToken);
+    .OrderBy(p => p.Name)
+    .Skip((filter.Page - 1) * filter.PageSize)
+    .Take(filter.PageSize)
+    .ToListAsync(cancellationToken);
 
         return new PagedResult<Product>
         {
             Items = products,
-            Page = page,
-            PageSize = pageSize,
+            Page = filter.Page,
+            PageSize = filter.PageSize,
             TotalCount = totalCount,
             TotalPages = (int)Math.Ceiling(
-                totalCount / (double)pageSize)
+                totalCount / (double)filter.PageSize)
         };
 
     }

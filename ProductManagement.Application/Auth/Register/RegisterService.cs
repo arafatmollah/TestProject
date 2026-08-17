@@ -35,7 +35,7 @@ public class RegisterService : IRegisterService
 
         if (!validationResult.IsValid)
         {
-            throw new ValidationException(
+             throw new ValidationException(
                 validationResult.Errors);
         }
 

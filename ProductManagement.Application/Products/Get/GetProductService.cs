@@ -2,33 +2,36 @@
 using ProductManagement.Application.Common.Pagination;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
-
+using AutoMapper;
 namespace ProductManagement.Application.Products.Get;
 
 public class GetProductsService : IGetProductsService
 {
     private readonly IProductRepository _repository;
     private readonly IMemoryCache _cache;
-
+    private readonly IMapper _mapper;
     public GetProductsService(
         IProductRepository repository,
-        IMemoryCache cache)
+        IMemoryCache cache,
+        IMapper mapper)
     {
         _repository = repository;
         _cache = cache;
+        _mapper = mapper;
     }
 
     public async Task<PagedResult<ProductDto>> GetAllAsync(
-        string? search,
-        string? productType,
-        decimal? minPrice,
-        decimal? maxPrice,
-        int page,
-        int pageSize,
-        CancellationToken cancellationToken = default)
+    ProductFilter filter,
+    CancellationToken cancellationToken = default)
     {
         var cacheKey =
-            $"products:{search}:{productType}:{minPrice}:{maxPrice}:{page}:{pageSize}";
+            $"products:" +
+            $"{filter.Search}:" +
+            $"{filter.ProductType}:" +
+            $"{filter.MinPrice}:" +
+            $"{filter.MaxPrice}:" +
+            $"{filter.Page}:" +
+            $"{filter.PageSize}";
 
         if (_cache.TryGetValue(
             cacheKey,
@@ -38,32 +41,11 @@ public class GetProductsService : IGetProductsService
         }
 
         var products = await _repository.GetAllAsync(
-            search,
-            productType,
-            minPrice,
-            maxPrice,
-            page,
-            pageSize,
+            filter,
             cancellationToken);
 
-        var items = products.Items
-            .Select(p => new ProductDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                Price = p.Price,
-                Quantity = p.Quantity,
-                ProductTypeId = p.ProductTypeId,
-                ProductTypeName =
-                    p.ProductType?.Name ?? string.Empty,
-                ExpirationDate =
-                    p.ProductExpiration?.ExpirationDate,
-                Tags = p.ProductTags
-                    .Select(t => t.Name)
-                    .ToList()
-            })
-            .ToList();
+        var items = _mapper.Map<List<ProductDto>>(
+            products.Items);
 
         var result = new PagedResult<ProductDto>
         {

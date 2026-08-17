@@ -1,4 +1,5 @@
 using FluentValidation;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using ProductManagement.API.Middleware;
 using ProductManagement.Application.Auth.Login;
 using ProductManagement.Application.Auth.Register;
+using ProductManagement.Application.Common.Mapping;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Application.Orders.CreateOrder;
@@ -24,6 +26,7 @@ using ProductManagement.Domain.Services;
 using ProductManagement.Infrastructure.Data;
 using ProductManagement.Infrastructure.Repositories;
 using ProductManagement.Infrastructure.Services;
+using ProductManagement.Application.Common.Mapping;
 //using ProductManagement.Infrastructure.Data;
 using System.Text;
 
@@ -113,6 +116,10 @@ builder.Services.AddScoped<
     IOrderRepository,
     OrderRepository>();
 builder.Services.AddScoped<ICreateOrderService, CreateOrderService>();
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<ProductProfile>();
+});
 var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())
