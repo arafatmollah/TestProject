@@ -37,12 +37,7 @@ public class CreateProductService : ICreateProductService
             dto,
             cancellationToken);
 
-        var product = _productDomainService.CreateProduct(
-            dto.Name,
-            dto.Description,
-            dto.Price,
-            dto.Quantity,
-            dto.ProductTypeId);
+        var product = _mapper.Map<Product>(dto);
 
         if (dto.ExpirationDate.HasValue)
         {

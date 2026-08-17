@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using ProductManagement.Application.DTOs;
+using ProductManagement.Application.Products.Create;
+using ProductManagement.Application.Products.Update;
 using ProductManagement.Domain.Entities;
 
 namespace ProductManagement.Application.Common.Mapping;
@@ -8,6 +10,7 @@ public class ProductProfile : Profile
 {
     public ProductProfile()
     {
+
         CreateMap<Product, ProductDto>()
             .ForMember(
                 dest => dest.ProductTypeName,
@@ -25,5 +28,8 @@ public class ProductProfile : Profile
                 dest => dest.Tags,
                 opt => opt.MapFrom(src =>
                     src.ProductTags.Select(x => x.Name)));
+
+        CreateMap<CreateProductDto, Product>();
+        CreateMap<UpdateProductDto, Product>();
     }
 }
